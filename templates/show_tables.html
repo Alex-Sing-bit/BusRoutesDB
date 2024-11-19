@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Window</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+    <div>
+        <h1>Выберите таблицу</h1>
+        <form method="POST" action="/show_tables">
+            <select name="table_selection" onchange="this.form.submit()">
+                <option value="Улица" {% if selected_table == 'Улица' %}selected{% endif %}>Улица</option>
+                <option value="Остановка" {% if selected_table == 'Остановка' %}selected{% endif %}>Остановка</option>
+                <option value="Здание" {% if selected_table == 'Здание' %}selected{% endif %}>Здание</option>
+                <option value="Маршрут" {% if selected_table == 'Маршрут' %}selected{% endif %}>Маршрут</option>
+                <option value="Общественный транспорт" {% if selected_table == 'Общественный транспорт' %}selected{% endif %}>Общественный транспорт</option>
+                <option value="Остановки на маршруте" {% if selected_table == 'Остановки на маршруте' %}selected{% endif %}>Остановки на маршруте</option>
+            </select>
+        </form>
+    </div>
+
+    <div>
+        <h2>Данные таблицы: {{ selected_table }}</h2>
+        <table id="data_table" class="display">
+            <thead>
+                <tr>
+                    {% for name in column_names %}
+                    <th>{{ name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in table_data %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form action="/" method="GET">
+        <button type="submit">Назад</button>
+    </form>
+
+    <script>
+        $(document).ready( function () {
+            $('#data_table').DataTable();
+        });
+    </script>
+</body>
+</html>

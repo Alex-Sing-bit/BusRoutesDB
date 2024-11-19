@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Window</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+</head>
+<body style="display: block; margin-left: 100px;">
+    <div>
+        <h1>Выберите таблицу</h1>
+        <form method="POST">
+            <select name="table_selection" onchange="this.form.submit()">
+                <option value="Улица" {% if selected_table == 'Улица' %}selected{% endif %}>Улица</option>
+                <option value="Остановка" {% if selected_table == 'Остановка' %}selected{% endif %}>Остановка</option>
+                <option value="Здание" {% if selected_table == 'Здание' %}selected{% endif %}>Здание</option>
+                <option value="Маршрут" {% if selected_table == 'Маршрут' %}selected{% endif %}>Маршрут</option>
+                <option value="Общественный транспорт" {% if selected_table == 'Общественный транспорт' %}selected{% endif %}>Общественный транспорт</option>
+                <option value="Остановки на маршруте" {% if selected_table == 'Остановки на маршруте' %}selected{% endif %}>Остановки на маршруте</option>
+            </select>
+        </form>
+    </div>
+    <div>
+        <h2>Изменить данные: {{ selected_table }}</h2>
+        <form id="dataForm" method="POST" onsubmit="return collectData()">
+            <label for="get_by_id_inp">{{ object[0] }}:</label>
+            <input type="number" id="get_by_id_inp" name="{{ object[0] }}"
+                   value="{{ input_fields[0] }}" style="display: block; margin-bottom: 10px;"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+            <input type="hidden" id="id_name" name="id_name" value="{{ object[0] }}">
+            <input type="hidden" id="selected_table" name="selected_table" value="{{ selected_table }}">
+            <button type="submit" name="action" value="get_by_id" style="display: block;
+            margin-bottom: 10px;" onclick="setRequiredFields('get_by_id')">Получить по id</button>
+            {% for index in range(object|length - 1) %}
+                <label for="field_{{ index + 1 }}">{{ object[index + 1] }}:</label>
+                <input type="text" id="field_{{ index + 1 }}" name="{{ object[index + 1] }}"
+                       value="{{ input_fields[index + 1] }}" style="display: block; margin-bottom: 10px;">
+            {% endfor %}
+            <button type="submit" onclick="setRequiredFields('update')" name="action" value="update">Изменить</button>
+            <button type="submit" onclick="setRequiredFields('add')" name="action" value="add">Добавить</button>
+            <button type="submit" onclick="setRequiredFields('delete')" name="action" value="delete">Удалить</button>
+        </form>
+    </div>
+    <form action="/" method="GET">
+        <button type="submit" style="display: block; margin-top: 10px;">Назад</button>
+    </form>
+    <script>
+        function setRequiredFields(action) {
+            const idInput = document.getElementById('get_by_id_inp');
+            const allInputs = document.querySelectorAll('input[type="text"]');
+            if (action === 'update' || action === 'add') {
+                allInputs.forEach(input => {
+                    input.required = true;
+                });
+                if (action === 'add') {
+                    idInput.required = false;
+                }
+            } else if (action === 'delete' || action === 'get_by_id') {
+                allInputs.forEach(input => {
+                    input.required = false;
+                });
+                idInput.required = true;
+            }
+        }
+        function collectData() {
+            const form = document.getElementById('dataForm');
+            const formData = new FormData(form);
+            const filteredData = {};
+            for (const [key, value] of formData.entries()) {
+                if (requiredFields.includes(key)) {
+                    filteredData[key] = value;
+                }
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
